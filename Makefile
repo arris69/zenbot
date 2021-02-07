@@ -25,7 +25,7 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 # Define the full path to this file
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
-# Set docker-compose file selector for windows
+# Set podman-compose file selector for windows
 ifneq (,$(findstring WINDOWS,$(PATH)))
 DC_CONFIG=$(ROOT_DIR)/docker-compose-windows.yml
 else
@@ -59,34 +59,34 @@ list:
 #############################
 
 list-strategies:
-	docker-compose exec server zenbot list-strategies $(ARGS)
+	podman-compose run server zenbot list-strategies $(ARGS)
 
 list-selectors:
-	docker-compose exec server zenbot list-selectors $(ARGS)
+	podman-compose run server zenbot list-selectors $(ARGS)
 
 backfill:
-	docker-compose exec server zenbot backfill $(ARGS)
+	podman-compose run server zenbot backfill $(ARGS)
 
 sim:
-	docker-compose exec server zenbot sim $(ARGS)
+	podman-compose run server zenbot sim $(ARGS)
 
 trade:
-	docker-compose exec server zenbot trade $(ARGS)
+	podman-compose run server zenbot trade $(ARGS)
 
 paper:
-	docker-compose exec server zenbot trade --paper $(ARGS)
+	podman-compose run server zenbot trade --paper $(ARGS)
 
 balance:
-	docker-compose exec server zenbot balance $(ARGS)
+	podman-compose run server zenbot balance $(ARGS)
 
 buy:
-	docker-compose exec server zenbot buy $(ARGS)
+	podman-compose run server zenbot buy $(ARGS)
 
 sell:
-	docker-compose exec server zenbot sell $(ARGS)
+	podman-compose run server zenbot sell $(ARGS)
 
 zenbot:
-	docker-compose exec server zenbot $(ARGS)
+	podman-compose run server zenbot $(ARGS)
 
 #############################
 # Docker machine states
@@ -95,35 +95,35 @@ time-sync:
 	docker run --rm --privileged alpine hwclock -s
 
 up:
-	$(SUDO) docker-compose --file=$(DC_CONFIG) up
+	$(SUDO) podman-compose --file=$(DC_CONFIG) up
 
 start:
-	docker-compose start
+	podman-compose start
 
 stop:
-	docker-compose stop
+	podman-compose stop
 
 state:
-	docker-compose ps
+	podman-compose ps
 
 rebuild:
-	$(SUDO) docker-compose stop
-	$(SUDO) docker-compose pull
-	$(SUDO) docker-compose rm --force server
-	$(SUDO) docker-compose rm --force mongodb
-	-$(SUDO) docker-compose rm --force adminmongo
-	$(SUDO) docker-compose build --no-cache
-	$(SUDO) docker-compose --file=$(DC_CONFIG) up -d --force-recreate
+	$(SUDO) podman-compose stop
+	$(SUDO) podman-compose pull
+	$(SUDO) podman-compose rm --force server
+	$(SUDO) podman-compose rm --force mongodb
+	-$(SUDO) podman-compose rm --force adminmongo
+	$(SUDO) podman-compose build --no-cache
+	$(SUDO) podman-compose --file=$(DC_CONFIG) up -d --force-recreate
 
 
 shell:
-	docker-compose exec server /bin/sh
+	podman-compose run server /bin/sh
 
 shellw:
-	docker exec -it -u root $$(docker-compose ps -q server) /bin/sh
+	docker run -it -u root $$(podman-compose ps -q server) /bin/sh
 
 logs:
-	docker-compose logs $(ARGS)
+	podman-compose logs $(ARGS)
 
 #############################
 # Argument fix workaround
